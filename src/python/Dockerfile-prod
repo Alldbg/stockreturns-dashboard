@@ -1,8 +1,23 @@
-FROM ubuntu:latest
-RUN apt-get update -y
-RUN apt-get install -y python3 python3-dev python3-pip
-COPY . /app
-WORKDIR /app
-RUN pip3 install -r requirements.txt
-ENTRYPOINT ["python3"]
-CMD ["app.py"]
+FROM python:3.7.8-buster
+
+ENV PROJECT_ROOT_PATH /tmp/www/
+ENV PROJECT_DIRECTORY backend/
+ENV PYTHONPATH "${PYTHONPATH}:${PROJECT_ROOT_PATH}"
+
+WORKDIR ${PROJECT_ROOT_PATH}/${PROJECT_DIRECTORY}
+
+ADD requirements.txt ${PROJECT_ROOT_PATH}/${PROJECT_DIRECTORY}
+
+
+RUN pip install  --no-cache-dir -r requirements.txt
+
+ADD . ${PROJECT_ROOT_PATH}/${PROJECT_DIRECTORY}
+
+RUN useradd -u 8877 user_em
+
+USER user_em
+
+
+EXPOSE 5000
+
+CMD ["python","app.py"]
